@@ -1,3 +1,4 @@
+import { postgresAdapter } from '@payloadcms/db-postgres'
 import { BlocksFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { fileURLToPath } from 'node:url'
 import path from 'path'
@@ -12,6 +13,27 @@ const dirname = path.dirname(filename)
 
 export default buildConfigWithDefaults({
   // ...extend config here
+  db: postgresAdapter({
+    pool: { connectionString: 'postgresql://postgres:password123@127.0.0.1:5430/postgres_db' },
+  }),
+  localization: {
+    locales: [
+      {
+        label: 'Deutsch',
+        code: 'de',
+      },
+      {
+        label: 'English',
+        code: 'en',
+      },
+      {
+        label: 'Español',
+        code: 'es',
+      },
+    ],
+    defaultLocale: 'de',
+    fallback: false,
+  },
   collections: [
     PostsCollection,
     {

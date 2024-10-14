@@ -17,6 +17,7 @@ export const PostsCollection: CollectionConfig = {
       name: 'text',
       label: 'Client Text Field',
       type: 'text',
+      localized: true,
     },
     {
       admin: {
@@ -26,6 +27,7 @@ export const PostsCollection: CollectionConfig = {
       },
       name: 'serverTextField',
       type: 'text',
+      localized: true,
     },
     {
       name: 'richText',
