@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { seoPlugin } from '@payloadcms/plugin-seo'
 import { BlocksFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { fileURLToPath } from 'node:url'
 import path from 'path'
@@ -34,6 +35,12 @@ export default buildConfigWithDefaults({
     defaultLocale: 'de',
     fallback: false,
   },
+  plugins: [
+    seoPlugin({
+      collections: ['posts'],
+      uploadsCollection: 'media',
+    }),
+  ],
   collections: [
     PostsCollection,
     {
