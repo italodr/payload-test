@@ -4,12 +4,13 @@ import httpStatus from 'http-status'
 
 import type { AccessResult } from '../../config/types.js'
 import type { CollectionSlug } from '../../index.js'
-import type { PayloadRequest, Where } from '../../types/index.js'
+import type { PayloadRequest, SelectType, Where } from '../../types/index.js'
 import type {
   BulkOperationResult,
   Collection,
   DataFromCollectionSlug,
   RequiredDataFromCollectionSlug,
+  SelectFromCollectionSlug,
 } from '../config/types.js'
 
 import { ensureUsernameOrEmail } from '../../auth/ensureUsernameOrEmail.js'
@@ -38,6 +39,7 @@ export type Arguments<TSlug extends CollectionSlug> = {
   collection: Collection
   data: DeepPartial<RequiredDataFromCollectionSlug<TSlug>>
   depth?: number
+  disableTransaction?: boolean
   disableVerificationEmail?: boolean
   draft?: boolean
   limit?: number
@@ -45,17 +47,21 @@ export type Arguments<TSlug extends CollectionSlug> = {
   overrideLock?: boolean
   overwriteExistingFiles?: boolean
   req: PayloadRequest
+  select?: SelectType
   showHiddenFields?: boolean
   where: Where
 }
 
-export const updateOperation = async <TSlug extends CollectionSlug>(
+export const updateOperation = async <
+  TSlug extends CollectionSlug,
+  TSelect extends SelectFromCollectionSlug<TSlug>,
+>(
   incomingArgs: Arguments<TSlug>,
-): Promise<BulkOperationResult<TSlug>> => {
+): Promise<BulkOperationResult<TSlug, TSelect>> => {
   let args = incomingArgs
 
   try {
-    const shouldCommit = await initTransaction(args.req)
+    const shouldCommit = !args.disableTransaction && (await initTransaction(args.req))
 
     // /////////////////////////////////////
     // beforeOperation - Collection
@@ -90,6 +96,7 @@ export const updateOperation = async <TSlug extends CollectionSlug>(
         payload,
       },
       req,
+      select,
       showHiddenFields,
       where,
     } = args
@@ -321,6 +328,7 @@ export const updateOperation = async <TSlug extends CollectionSlug>(
             data: result,
             locale,
             req,
+            select,
           })
         }
 
@@ -335,6 +343,7 @@ export const updateOperation = async <TSlug extends CollectionSlug>(
             docWithLocales: result,
             payload,
             req,
+            select,
           })
         }
 
@@ -353,6 +362,7 @@ export const updateOperation = async <TSlug extends CollectionSlug>(
           locale,
           overrideAccess,
           req,
+          select,
           showHiddenFields,
         })
 
